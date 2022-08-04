@@ -1,0 +1,44 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0-windows</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UseWindowsForms>true</UseWindowsForms>
+		<Nullable>enable</Nullable>
+		<RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="Metadata\OraCatalog.cs" />
+	  <Compile Remove="Metadata\OracleSchema.cs" />
+	  <Compile Remove="OracleDatabase.cs" />
+	  <Compile Remove="OraConnection.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.61" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ExecuteSharp\ExecuteSharp.csproj">
+			<CopyLocal>False</CopyLocal>
+			<Private>false</Private>
+		</ProjectReference>
+	</ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="UI\OracleConnectControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Metadata\" />
+  </ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="mkdir &quot;$(SolutionDir)ExecuteSharp.UI\bin\Debug\net6.0-windows\Plugins\$(ProjectName) &quot;&#xD;&#xA;copy &quot;$(TargetDir)\*.*&quot; &quot;$(SolutionDir)ExecuteSharp.UI\bin\Debug\net6.0-windows\Plugins\$(ProjectName)&quot;" />
+	</Target>
+
+</Project>
