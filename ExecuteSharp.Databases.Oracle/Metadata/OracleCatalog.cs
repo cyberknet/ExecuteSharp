@@ -6,11 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ExecuteSharp.Databases.Oracle
+namespace ExecuteSharp.Databases.Oracle.Metadata
 {
-    public class OracleSchema : Schema
+    public class OracleCatalog : Catalog
     {
-        public OracleSchema(Catalog catalog, string name) : base(catalog, name)
+        public OracleCatalog(string name) : base(name)
         {
         }
     }

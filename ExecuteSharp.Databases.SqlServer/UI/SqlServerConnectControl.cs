@@ -47,9 +47,7 @@ namespace ExecuteSharp.Databases.SqlServer.UI
         public IPluginConfiguration GetPluginConfiguration()
         {
             string password = string.Empty;
-            List<SqlServerConnectionDetails> recent = new List<SqlServerConnectionDetails>();
-
-            if (RecentConnections.SelectedIndex <= 0)
+            if (PluginConfiguration != null && RecentConnections.SelectedIndex <= 0)
             {
                 SqlServerConnectionDetails? current = new SqlServerConnectionDetails();
                 current.SqlAuthenticationType = (SqlAuthenticationType)AuthenticationType.SelectedIndex;
@@ -72,13 +70,60 @@ namespace ExecuteSharp.Databases.SqlServer.UI
                         break;
                 }
                 if (current != null)
-                    recent.Insert(0, current);
+                {
+                    bool found = false;
+                    foreach (var recent in PluginConfiguration.Recent)
+                    {
+                        // if the hostname doesn't match, then it's not the same
+                        if (recent.Hostname.ToLower().Trim() != current.Hostname.ToLower().Trim())
+                            continue;
+                        // if the authentication type doesn't match, then it's not the same
+                        if (recent.SqlAuthenticationType != current.SqlAuthenticationType)
+                            continue;
+                        switch(current.SqlAuthenticationType)
+                        {
+                            // For SQL Server authentication
+                            case SqlAuthenticationType.SqlServer:
+                            case SqlAuthenticationType.AzurePassword:
+                                // if the user id doesn't match, then it's not the same
+                                if (current.UserId != recent.UserId)
+                                    continue;
+                                // if the password doesn't match, then update the password
+                                // and treat it as if it was the same
+                                if (current.Password != recent.Password)
+                                    recent.Password = current.Password;
+                                // mark as found, they are the same
+                                found = true;
+                                break;
+                            // for Windows authentication
+                            case SqlAuthenticationType.Windows:
+                            case SqlAuthenticationType.AzureIntegrated:
+                                // mark as found, they are the same
+                                found = true;
+                                break;
+                            case SqlAuthenticationType.AzureMFA:
+                                // if the user id doesn't match, then it's not the same
+                                if (current.UserId != recent.UserId)
+                                    continue;
+                                // mark as found, they are the same
+                                found = true;
+                                break;
+                        }
+                        if (found)
+                            break;
+                    }
+                    if (!found)
+                        PluginConfiguration?.Recent.Insert(0, current);
+                }
             }
             else if (RecentConnections.SelectedIndex > 1)
             {
-                var item = PluginConfiguration.Recent[RecentConnections.SelectedIndex - 1];
-                if (PluginConfiguration.Recent.Remove(item))
-                    PluginConfiguration.Recent.Insert(0, item);
+                var item = PluginConfiguration?.Recent[RecentConnections.SelectedIndex - 1];
+                if (PluginConfiguration != null && item != null)
+                {
+                    if (PluginConfiguration.Recent.Remove(item))
+                        PluginConfiguration.Recent.Insert(0, item);
+                }
 
             }
 

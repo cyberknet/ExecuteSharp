@@ -10,6 +10,7 @@ namespace ExecuteSharp.Metadata
     {
         protected Query _query;
         public abstract bool DisplayBySchema { get; }
+        public abstract bool DisplayByCatalog { get; }
         public MetadataExplorer(Query query)
         {
             _query = query;

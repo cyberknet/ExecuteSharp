@@ -16,6 +16,12 @@ namespace ExecuteSharp.Databases.Oracle
         {
         }
 
+        protected override DbConnection InitializeConnection(string connectionString)
+        {
+            var connection = new OracleConnection(connectionString);
+            return connection;
+        }
+
         protected override void SetupOutputCapture()
         {
             if (this._connection is OracleConnection oracleConnection)
@@ -24,24 +30,20 @@ namespace ExecuteSharp.Databases.Oracle
             }
         }
 
-        protected override DbConnection InitializeConnection(string connectionString)
-        {
-            var connection = new OracleConnection(connectionString);
-            return connection;
-        }
-
         protected override DbCommand? CreateCommand(string query, params DbParameter[] parameters)
         {
-            if (this._connection is OracleConnection oracleConnection && _transaction is OracleTransaction oracleTransaction && parameters is OracleParameter[] oracleParameters)
+            if (this._connection is OracleConnection oracleConnection)
             {
-                var command = new OracleCommand(query, oracleConnection);
-                command.Transaction = oracleTransaction;
-
-                if (parameters.Length > 0)
+                if (_transaction is OracleTransaction oracleTransaction)
                 {
-                    command.Parameters.AddRange(oracleParameters);
+                    var command = new OracleCommand(query, oracleConnection);
+                    command.Transaction = oracleTransaction;
+                    if (parameters.Length > 0 && parameters is OracleParameter[] oracleParameters)
+                    {
+                        command.Parameters.AddRange(oracleParameters);
+                    }
+                    return command;
                 }
-                return command;
             }
             return null;
         }
@@ -52,7 +54,7 @@ namespace ExecuteSharp.Databases.Oracle
             if (e.Errors != null)
             {
                 foreach (OracleError error in e.Errors)
-                    errors.Add(error.ToString());
+                    errors.Add(error?.ToString() ?? string.Empty);
             }
             this.OnOutputReceived(new QueryOutputEventArgs
             {
@@ -62,7 +64,7 @@ namespace ExecuteSharp.Databases.Oracle
             });
         }
 
-
+        #region CreateParameter
         #region CreateDbParameter
         public override DbParameter? CreateDbParameter(string parameterName, object value, DbType dbType)
         {
@@ -126,7 +128,6 @@ namespace ExecuteSharp.Databases.Oracle
                 return null;
             }
         }
-
         public override DbParameter CreateDbParameter(string parameterName, object value)
         {
             return new OracleParameter(parameterName, value);
@@ -135,6 +136,7 @@ namespace ExecuteSharp.Databases.Oracle
         {
             return new OracleParameter();
         }
+        #endregion
         #endregion
     }
 }

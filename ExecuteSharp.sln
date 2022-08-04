@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExecuteSharp.Databases.SqlS
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Databases", "Databases", "{D1816D00-2EE1-415B-AFCA-C15239775E2D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExecuteSharp.Databases.Oracle", "ExecuteSharp.Databases.Oracle\ExecuteSharp.Databases.Oracle.csproj", "{27E896F3-5543-4035-BAFA-DE23ECD67524}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,12 +31,17 @@ Global
 		{201647F1-2697-450E-91F6-5E0ED1A49957}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{201647F1-2697-450E-91F6-5E0ED1A49957}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{201647F1-2697-450E-91F6-5E0ED1A49957}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27E896F3-5543-4035-BAFA-DE23ECD67524}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27E896F3-5543-4035-BAFA-DE23ECD67524}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27E896F3-5543-4035-BAFA-DE23ECD67524}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27E896F3-5543-4035-BAFA-DE23ECD67524}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{201647F1-2697-450E-91F6-5E0ED1A49957} = {D1816D00-2EE1-415B-AFCA-C15239775E2D}
+		{27E896F3-5543-4035-BAFA-DE23ECD67524} = {D1816D00-2EE1-415B-AFCA-C15239775E2D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7C47C56B-2027-40A5-9095-6975C9A44FC4}

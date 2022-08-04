@@ -11,7 +11,6 @@
 
 	<ItemGroup>
 	  <Compile Remove="Metadata\OraCatalog.cs" />
-	  <Compile Remove="Metadata\OracleSchema.cs" />
 	  <Compile Remove="OracleDatabase.cs" />
 	  <Compile Remove="OraConnection.cs" />
 	</ItemGroup>
@@ -31,10 +30,6 @@
     <Compile Update="UI\OracleConnectControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Metadata\" />
   </ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

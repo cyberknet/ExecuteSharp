@@ -44,7 +44,8 @@ namespace ExecuteSharp.UI.Controls
             PluginInstance = pluginInstance;
             _metadataExplorer = pluginInstance.GetMetadataExplorer();
             //_connection = PluginInstance.GetQuery();
-            LoadCatalogs();
+            if (_metadataExplorer.DisplayByCatalog)
+                LoadCatalogs();
         }
 
 
@@ -198,7 +199,7 @@ namespace ExecuteSharp.UI.Controls
                 // call the function provided above to retrieve data from the requisite MetadataExplorer object
                 var results = await func(catalog, null);
                 // if one or more results were found
-                if (results != null && results.Length > 0)
+                if (results != null)
                 {
                     // clear the child nodes from the parent node (remove the Placeholder node)
                     eventNode.Nodes.Clear();

@@ -1,4 +1,5 @@
 ﻿using ExecuteSharp;
+using ExecuteSharp.Databases.Oracle.Metadata;
 using ExecuteSharp.Metadata;
 using ExecuteSharp.Plugins;
 using System;
@@ -35,13 +36,18 @@ namespace ExecuteSharp.Databases.Oracle
 
         public Query GetQuery(TimeSpan timeout)
         {
-            OracleQuery query = new (ConnectionString, timeout);
-            return query;
+
+            return GetOracleQuery(timeout);
+        }
+
+        private OracleQuery GetOracleQuery(TimeSpan timeout)
+        {
+            return new(ConnectionString, timeout);
         }
 
         public MetadataExplorer GetMetadataExplorer()
         {
-            return null;
+            return new OracleMetadataExplorer(GetOracleQuery(new TimeSpan(0, 5, 0)));
         }
     }
 }

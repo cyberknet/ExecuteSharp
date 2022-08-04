@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ExecuteSharp.Metadata;
-using Microsoft.Data.SqlClient;
+using Oracle.ManagedDataAccess.Client;
 using View = ExecuteSharp.Metadata.View;
 
-namespace ExecuteSharp.Databases.SqlServer.Metadata
+namespace ExecuteSharp.Databases.Oracle.Metadata
 {
-    public class SqlServerMetadataExplorer : MetadataExplorer
+    public class OracleMetadataExplorer : MetadataExplorer
     {
         const string SQL_CATALOGS = "select name from sys.databases where owner_sid != 1 order by name asc";
         const string SQL_SCHEMAS = 
@@ -45,17 +45,17 @@ ORDER BY  SCHEMA_NAME";
         const string SQL_FUNCTIONS = "select routine_name as procedure_name, routine_schema as procedure_schema from {0}.INFORMATION_SCHEMA.ROUTINES{1} order by routine_name asc";
         const string SQL_FUNCTIONS_SCHEMA = " where routine_schema='@schema_name'";
 
-        private SqlServerQuery _sqlServerQuery;
-        public override bool DisplayBySchema { get => false; }
-        public override bool DisplayByCatalog { get => true; }
-        public SqlServerMetadataExplorer(SqlServerQuery query) : base(query)
+        private OracleQuery _oracleQuery;
+        public override bool DisplayBySchema { get => true; }
+        public override bool DisplayByCatalog { get => false; }
+        public OracleMetadataExplorer(OracleQuery query) : base(query)
         {
-                _sqlServerQuery = query;
+                _oracleQuery = query;
         }
         public override async Task<Catalog[]> LoadCatalogs()
         {
             List<Catalog> catalogs = new List<Catalog>();
-            var reader = await _sqlServerQuery.ExecuteReaderAsync(SQL_CATALOGS);
+            var reader = await _oracleQuery.ExecuteReaderAsync(SQL_CATALOGS);
             if (!reader.IsClosed)
             {
                 while (reader.Read())
@@ -63,7 +63,7 @@ ORDER BY  SCHEMA_NAME";
                     var name = reader[0].ToString();
                     if (!string.IsNullOrEmpty(name))
                     {
-                        var catalog = new SqlServerCatalog(name);
+                        var catalog = new OracleCatalog(name);
                         catalogs.Add((Catalog)catalog);
                     }
                 }
@@ -77,7 +77,7 @@ ORDER BY  SCHEMA_NAME";
         {
             var explorerCatalog = Catalogs.FirstOrDefault(c => c.Name == catalog.Name);
             var schemas = new List<Schema>();
-            var reader = await _sqlServerQuery.ExecuteReaderAsync(string.Format(SQL_SCHEMAS, catalog.Name));
+            var reader = await _oracleQuery.ExecuteReaderAsync(string.Format(SQL_SCHEMAS, catalog.Name));
             if (explorerCatalog != null)
             {
                 if (!reader.IsClosed)
@@ -87,7 +87,7 @@ ORDER BY  SCHEMA_NAME";
                         var name = reader[0].ToString();
                         if (name != null)
                         {
-                            var schema = new SqlServerSchema(explorerCatalog, name);
+                            var schema = new OracleSchema(explorerCatalog, name);
                             schemas.Add(schema);
                         }
                     }
@@ -100,30 +100,30 @@ ORDER BY  SCHEMA_NAME";
 
         public override async Task<Table[]> LoadTables(Catalog catalog, Schema? schema)
         {
-            var results = await LoadObjects<Table, SqlServerTable>(catalog.Name, catalog.Tables, schema, SQL_TABLES, SQL_TABLES_SCHEMA);
+            var results = await LoadObjects<Table, OracleTable>(catalog.Name, catalog.Tables, schema, SQL_TABLES, SQL_TABLES_SCHEMA);
             return results.ToArray();
         }
 
         public override async Task<View[]> LoadViews(Catalog catalog, Schema? schema)
         {
-            var results = await LoadObjects<View, SqlServerView>(catalog.Name, catalog.Views, schema, SQL_VIEWS, SQL_VIEWS_SCHEMA);
+            var results = await LoadObjects<View, OracleView>(catalog.Name, catalog.Views, schema, SQL_VIEWS, SQL_VIEWS_SCHEMA);
             return results.ToArray();
         }
 
         public override async Task<Synonym[]> LoadSynonyms(Catalog catalog, Schema? schema)
         {
-            var results = await LoadObjects<Synonym, SqlServerSynonym>(catalog.Name, catalog.Synonyms, schema, SQL_SYNONYMS, SQL_SYNONYMS_SCHEMA);
+            var results = await LoadObjects<Synonym, OracleSynonym>(catalog.Name, catalog.Synonyms, schema, SQL_SYNONYMS, SQL_SYNONYMS_SCHEMA);
             return results.ToArray();
         }
 
         public override async Task<StoredProcedure[]> LoadStoredProcedures(Catalog catalog, Schema? schema)
         {
-            var results = await LoadObjects <StoredProcedure, SqlServerStoredProcedure>(catalog.Name, catalog.StoredProcedures, schema, SQL_STORED_PROCEDURES, SQL_STORED_PROCEDURES_SCHEMA);
+            var results = await LoadObjects <StoredProcedure, OracleStoredProcedure>(catalog.Name, catalog.StoredProcedures, schema, SQL_STORED_PROCEDURES, SQL_STORED_PROCEDURES_SCHEMA);
             return results.ToArray();
         }
         public override async Task<Function[]> LoadFunctions(Catalog catalog, Schema? schema)
         {
-            var results = await LoadObjects<Function,SqlServerFunction>(catalog.Name, catalog.Functions, schema, SQL_FUNCTIONS, SQL_FUNCTIONS_SCHEMA);
+            var results = await LoadObjects<Function,OracleFunction>(catalog.Name, catalog.Functions, schema, SQL_FUNCTIONS, SQL_FUNCTIONS_SCHEMA);
             return results.ToArray();
         }
 
@@ -141,7 +141,7 @@ ORDER BY  SCHEMA_NAME";
             List<DbParameter> parameters = new();
 
             // make sure the catalog found is not null
-            if (explorerCatalog != null && _sqlServerQuery != null)
+            if (explorerCatalog != null && _oracleQuery != null)
             {
                 // if the schema was passed in
                 if (schema != null)
@@ -149,12 +149,12 @@ ORDER BY  SCHEMA_NAME";
                     // add the schema filter subsection
                     sql_schema = sqlSchemaFilter;
                     // create a parameter for the schema name
-                    var param = _sqlServerQuery.CreateDbParameter("@schema_name", schema.Name);
+                    var param = _oracleQuery.CreateDbParameter("@schema_name", schema.Name);
                     parameters.Add(param);
                 }
 
                 // query the SQL Server for the records that matched
-                var reader = await _sqlServerQuery.ExecuteReaderAsync(string.Format(sql, catalogName, sql_schema), parameters.ToArray());
+                var reader = await _oracleQuery.ExecuteReaderAsync(string.Format(sql, catalogName, sql_schema), parameters.ToArray());
 
                 // if records were found
                 if (!reader.IsClosed)
